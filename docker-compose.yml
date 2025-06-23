@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  shopping-list-app:
+    build: .
+    container_name: shopping-list-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./dashboards:/app/dashboards
+      - shopping_list_data:/app
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=false
+      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: shopping-list-ngrok
+    ports:
+      - "4040:4040"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN:-}
+    command: http shopping-list-app:8501
+    depends_on:
+      - shopping-list-app
+    restart: unless-stopped
+    profiles:
+      - ngrok
+
+volumes:
+  shopping_list_data: 
