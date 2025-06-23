@@ -128,11 +128,7 @@ def show_shopping_list_page():
                 </div>
                 '''
                 st.markdown(tag_html, unsafe_allow_html=True)
-                
-                # Add remove button functionality
-                if st.button(f"Remove", key=f"remove_{i}"):
-                    remove_item(i)
-                    st.rerun()
+                    
     else:
         st.markdown("### 🛍️ No items in your shopping list yet!")
         st.markdown("Add some items above to get started!")
